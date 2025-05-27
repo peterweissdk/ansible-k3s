@@ -1,0 +1,60 @@
+---
+# Playbook to uninstall K3s from all nodes in the cluster
+- name: Uninstall K3s from agent nodes
+  hosts: agents
+  become: true
+  # Process one agent at a time
+  serial: 1
+  tasks:
+    - name: Run K3s agent uninstall script
+      shell: /usr/local/bin/k3s-agent-uninstall.sh
+      ignore_errors: true
+      register: agent_uninstall
+
+    - name: Check if uninstall was successful
+      debug:
+        msg: "Agent uninstall on {{ inventory_hostname }} completed with status: {{ 'Success' if agent_uninstall.rc == 0 else 'Failed - ' + agent_uninstall.stderr }}"
+
+    - name: Verify K3s agent process is not running
+      shell: "ps aux | grep k3s-agent | grep -v grep"
+      register: agent_process_check
+      failed_when: false
+      changed_when: false
+
+    - name: Report agent process status
+      debug:
+        msg: "K3s agent process status on {{ inventory_hostname }}: {{ 'Stopped' if agent_process_check.rc != 0 else 'Still running' }}"
+
+- name: Uninstall K3s from control plane nodes
+  hosts: control_plane
+  become: true
+  # Process one control plane node at a time
+  serial: 1
+  tasks:
+    - name: Run K3s server uninstall script
+      shell: /usr/local/bin/k3s-uninstall.sh
+      ignore_errors: true
+      register: server_uninstall
+
+    - name: Check if uninstall was successful
+      debug:
+        msg: "Server uninstall on {{ inventory_hostname }} completed with status: {{ 'Success' if server_uninstall.rc == 0 else 'Failed - ' + server_uninstall.stderr }}"
+
+    - name: Verify K3s server process is not running
+      shell: "ps aux | grep k3s-server | grep -v grep"
+      register: server_process_check
+      failed_when: false
+      changed_when: false
+
+    - name: Report server process status
+      debug:
+        msg: "K3s server process status on {{ inventory_hostname }}: {{ 'Stopped' if server_process_check.rc != 0 else 'Still running' }}"
+
+    - name: Clean up K3s directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /etc/rancher/k3s
+        - /var/lib/rancher/k3s
+      ignore_errors: true

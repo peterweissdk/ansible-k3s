@@ -15,15 +15,14 @@
       debug:
         msg: "Agent uninstall on {{ inventory_hostname }} completed with status: {{ 'Success' if agent_uninstall.rc == 0 else 'Failed - ' + agent_uninstall.stderr }}"
 
-    - name: Verify K3s agent process is not running
-      shell: "ps aux | grep k3s-agent | grep -v grep"
-      register: agent_process_check
-      failed_when: false
-      changed_when: false
+    - name: Check if K3s agent service exists
+      stat:
+        path: /etc/systemd/system/k3s-agent.service
+      register: agent_service_check
 
-    - name: Report agent process status
+    - name: Report agent service status
       debug:
-        msg: "K3s agent process status on {{ inventory_hostname }}: {{ 'Stopped' if agent_process_check.rc != 0 else 'Still running' }}"
+        msg: "K3s agent service on {{ inventory_hostname }}: {{ 'Removed' if not agent_service_check.stat.exists else 'Still present' }}"
 
 - name: Uninstall K3s from control plane nodes
   hosts: control_plane
@@ -40,15 +39,14 @@
       debug:
         msg: "Server uninstall on {{ inventory_hostname }} completed with status: {{ 'Success' if server_uninstall.rc == 0 else 'Failed - ' + server_uninstall.stderr }}"
 
-    - name: Verify K3s server process is not running
-      shell: "ps aux | grep k3s-server | grep -v grep"
-      register: server_process_check
-      failed_when: false
-      changed_when: false
+    - name: Check if K3s server service exists
+      stat:
+        path: /etc/systemd/system/k3s.service
+      register: server_service_check
 
-    - name: Report server process status
+    - name: Report server service status
       debug:
-        msg: "K3s server process status on {{ inventory_hostname }}: {{ 'Stopped' if server_process_check.rc != 0 else 'Still running' }}"
+        msg: "K3s server service on {{ inventory_hostname }}: {{ 'Removed' if not server_service_check.stat.exists else 'Still present' }}"
 
     - name: Clean up K3s directories
       file:

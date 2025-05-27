@@ -57,10 +57,12 @@ Configuration variables:
 ```
 ansible-k3s/
 ├── group_vars/
-│   └── all.yaml         # Global variables
-├── hosts                # Inventory file
-├── k3s-install.yaml    # Installation playbook
-└── k3s-uninstall.yaml  # Uninstallation playbook
+│   └── all.yaml
+├── hosts
+├── k3s-install.yaml
+├── k3s-uninstall.yaml
+├── LICENSE
+└── README.md
 ```
 
 ## 🔍 Health Check

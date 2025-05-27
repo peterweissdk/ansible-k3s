@@ -1,0 +1,112 @@
+---
+# Playbook to install a K3s Kubernetes cluster with control plane and agent nodes
+- name: Install K3s Cluster
+  # Target all hosts in the k3s_cluster group
+  hosts: k3s_cluster
+  # Run tasks with elevated privileges
+  become: true
+  # Process one host at a time to ensure controlled cluster formation
+  serial: 1
+
+  tasks:
+    # Install K3s in server mode on control plane nodes
+    - name: Install and verify control plane nodes
+      # Only run this block on hosts in the control_plane group
+      when: inventory_hostname in groups['control_plane']
+      block:
+        # Download and install K3s server
+        - name: Install K3s server
+          shell: |
+            curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION={{ k3s_version }} sh -s - server \
+              --token={{ k3s_token }} \
+              --datastore-endpoint="{{ db_endpoint }}" \
+              --disable=traefik \
+              --kube-proxy-arg=ipvs-strict-arp=true \
+              --disable=servicelb \
+              --tls-san={{ api_endpoint }}
+          args:
+            # Prevent reinstallation if K3s is already installed
+            creates: /usr/local/bin/k3s
+
+        # Ensure K3s server service is running
+        - name: Ensure K3s service is running
+          systemd:
+            name: k3s
+            state: started
+            enabled: yes
+          # Store the K3s service status to check if it's active
+          register: k3s_service_status
+          # Retry up to 10 times with 5 second delays until service is active
+          until: k3s_service_status.status.ActiveState == "active"
+          retries: 10
+          delay: 5
+
+        # Verify K3s API is responding
+        - name: Wait for K3s API to be available
+          shell: kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml get --raw /healthz
+          # Store the API health check result to verify cluster is responding
+          register: k3s_api_health
+          # Retry up to 30 times with 10 second delays until API responds
+          until: k3s_api_health.rc == 0
+          retries: 30
+          delay: 10
+
+    # Install K3s in agent mode on agent nodes
+    - name: Install and verify agent nodes
+      # Only run this block on hosts in the agents group
+      when: inventory_hostname in groups['agents']
+      block:
+        # Download and install K3s agent
+        - name: Install K3s agent
+          shell: |
+            curl -sfL https://get.k3s.io | K3S_TOKEN={{ k3s_token }} INSTALL_K3S_VERSION={{ k3s_version }} sh -s - agent \
+              --server https://{{ api_endpoint }}:6443 \
+              --kube-proxy-arg=ipvs-strict-arp=true
+          args:
+            # Prevent reinstallation if K3s is already installed
+            creates: /usr/local/bin/k3s
+
+        # Ensure K3s agent service is running
+        - name: Ensure K3s agent service is running
+          systemd:
+            name: k3s-agent
+            state: started
+            enabled: yes
+          # Store the K3s agent service status to check if it's active
+          register: k3s_agent_service_status
+          # Retry up to 10 times with 5 second delays until service is active
+          until: k3s_agent_service_status.status.ActiveState == "active"
+          retries: 10
+          delay: 5
+
+    # Verify all nodes are ready in the cluster
+    - name: Wait for nodes to be ready
+      # Only run this check from the first control plane node
+      when: inventory_hostname == groups['control_plane'][0]
+      shell: kubectl wait --for=condition=Ready nodes --all --timeout=300s
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+      # Store the result of waiting for nodes to be ready
+      register: wait_result
+      # Retry up to 10 times with 30 second delays until all nodes are ready
+      until: wait_result.rc == 0
+      retries: 10
+      delay: 30
+
+    # Add Kubernetes labels to agent nodes for identification
+    - name: Label agent nodes
+      # Only run this from the first control plane node
+      when: inventory_hostname == groups['control_plane'][0]
+      shell: |
+        for node in $(kubectl get nodes --selector='!node-role.kubernetes.io/master' -o name); do
+          kubectl label --overwrite $node node-role.kubernetes.io/agent=true
+        done
+      environment:
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+    # Show the kubeconfig in the Ansible output
+    - name: Show k3s.yaml content
+      when: inventory_hostname == groups['control_plane'][0]
+      # Use debug module to print the content of k3s.yaml to the Ansible output
+      debug:
+        msg: "{{ lookup('file', '/etc/rancher/k3s/k3s.yaml') }}"

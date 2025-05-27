@@ -3,7 +3,7 @@
 k3s_version: v1.31.5+k3s1
 
 # Define a secure token for cluster formation. Change this to a strong, random string
-k3s_token: k3stoken
+k3s_token: my_secret_token
 
 # MySQL database connection string. Update username, password, IP address, and database name
 db_endpoint: "mysql://username:password@tcp(192.168.1.11:3306)/k3s"

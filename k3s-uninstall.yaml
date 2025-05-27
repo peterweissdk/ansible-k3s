@@ -14,16 +14,21 @@
   # Process one agent at a time for controlled teardown
   serial: 1
   tasks:
-    # Execute the K3s agent uninstall script
+    # Check if K3s agent uninstall script exists
+    - name: Check if K3s agent uninstall script exists
+      stat:
+        path: /usr/local/bin/k3s-agent-uninstall.sh
+      register: agent_script
+
+    # Execute the K3s agent uninstall script only if it exists
     - name: Run K3s agent uninstall script
       shell: /usr/local/bin/k3s-agent-uninstall.sh
-      # Continue playbook even if uninstall fails
-      ignore_errors: true
+      when: agent_script.stat.exists
       register: agent_uninstall
-
-    # Only run the following tasks if the uninstall script was successful
+      
+    # Only run the following tasks if the uninstall script exists (indicating K3s is/was installed)
     - name: Post-uninstall tasks
-      when: agent_uninstall.rc == 0
+      when: agent_script.stat.exists
       block:
         # Display the uninstall result
         - name: Check if uninstall was successful
@@ -53,10 +58,10 @@
           # - /etc/rancher/k3s: Contains configuration files, certificates, and manifests
           # - /var/lib/rancher/k3s: Contains cluster data, container images, and storage
           loop:
-        - /etc/rancher/k3s
-        - /var/lib/rancher/k3s
-      # Continue even if directory deletion fails
-      ignore_errors: true
+            - /etc/rancher/k3s
+            - /var/lib/rancher/k3s
+          # Continue even if directory deletion fails
+          ignore_errors: true
 
 # Phase 2: Uninstall K3s from control plane nodes
 - name: Uninstall K3s from control plane nodes
@@ -67,16 +72,21 @@
   # Process one control plane node at a time for controlled teardown
   serial: 1
   tasks:
-    # Execute the K3s server uninstall script
+    # Check if K3s server uninstall script exists
+    - name: Check if K3s server uninstall script exists
+      stat:
+        path: /usr/local/bin/k3s-uninstall.sh
+      register: server_script
+
+    # Execute the K3s server uninstall script only if it exists
     - name: Run K3s server uninstall script
       shell: /usr/local/bin/k3s-uninstall.sh
-      # Continue playbook even if uninstall fails
-      ignore_errors: true
+      when: server_script.stat.exists
       register: server_uninstall
-
-    # Only run the following tasks if the uninstall script was successful
+      
+    # Only run the following tasks if the uninstall script exists (indicating K3s is/was installed)
     - name: Post-uninstall tasks
-      when: server_uninstall.rc == 0
+      when: server_script.stat.exists
       block:
         # Display the uninstall result
         - name: Check if uninstall was successful

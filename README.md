@@ -1,6 +1,8 @@
 # ---ALFA, USE WITH CAUTION---
 
 # 💾 Ansible K3s Cluster Deployment
+[![Static Badge](https://img.shields.io/badge/Ansible-Automation-white?style=flat&logo=ansible&logoColor=white&logoSize=auto&labelColor=black)](https://docs.ansible.com/)
+[![Static Badge](https://img.shields.io/badge/K3s-Kubernetes-white?style=flat&logo=k3s&logoColor=white&logoSize=auto&labelColor=black)](https://k3s.io/)
 
 Automated deployment and management of a K3s Kubernetes cluster using Ansible. This project enables easy setup and teardown of a multi-node K3s cluster with dedicated control plane and agent nodes.
 

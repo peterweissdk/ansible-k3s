@@ -63,6 +63,8 @@
           until: k3s_service_status.status.ActiveState == "active"
           retries: 10
           delay: 5
+          # This task only checks service status, it doesn't modify the system
+          changed_when: false
 
         # Verify K3s API is responding
         - name: Wait for K3s API to be available
@@ -73,6 +75,8 @@
           until: k3s_api_health.rc == 0
           retries: 30
           delay: 10
+          # This task only verifies API health, it doesn't modify the system
+          changed_when: false
 
 
 # Phase 2: Install Agent Nodes
@@ -108,6 +112,8 @@
           until: k3s_agent_service_status.status.ActiveState == "active"
           retries: 10
           delay: 5
+          # This task only checks service status, it doesn't modify the system
+          changed_when: false
 
 
 # Phase 3: Verify Cluster Health and Display Configuration
@@ -126,6 +132,8 @@
       until: wait_result.rc == 0
       retries: 10
       delay: 30
+      # This task only checks node readiness, it doesn't modify the system
+      changed_when: false
 
     # Show the kubeconfig as the final step
     - name: Read kubeconfig

@@ -128,10 +128,11 @@
       delay: 30
 
     # Show the kubeconfig as the final step
-    - name: Show k3s.yaml content
-      shell: cat /etc/rancher/k3s/k3s.yaml
+    - name: Read kubeconfig
+      slurp:
+        src: /etc/rancher/k3s/k3s.yaml
       register: kubeconfig
 
     - name: Display kubeconfig
       debug:
-        msg: "{{ kubeconfig.stdout }}"
+        msg: "{{ kubeconfig['content'] | b64decode }}"

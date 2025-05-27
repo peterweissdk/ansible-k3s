@@ -1,5 +1,3 @@
-# ---ALFA, USE WITH CAUTION---
-
 # 💾 Ansible K3s Cluster Deployment
 [![Static Badge](https://img.shields.io/badge/Ansible-Automation-white?style=flat&logo=ansible&logoColor=white&logoSize=auto&labelColor=black)](https://docs.ansible.com/)
 [![Static Badge](https://img.shields.io/badge/K3s-Kubernetes-white?style=flat&logo=k3s&logoColor=white&logoSize=auto&labelColor=black)](https://k3s.io/)
@@ -10,9 +8,6 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
 
 - Automated K3s cluster deployment and uninstallation
 - Multi-node support with control plane and agent nodes
-- MySQL database backend for high availability
-- Serial processing for controlled cluster operations
-- Configurable node roles (control plane/agent)
 - Detailed status reporting and health checks
 - Idempotent operations - safe to re-run
 
@@ -44,10 +39,10 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
 
 2. Update configuration in `group_vars/all.yaml`:
    ```yaml
-   k3s_version: "v1.31.5+k3s1"
-   k3s_token: "your_secure_token"
-   db_endpoint: "mysql://user:pass@host:3306/k3s"
-   api_endpoint: "your_api_ip"
+   k3s_version: "v1.31.5+k3s1" # Specify K3s version to install
+   k3s_token: "your_secure_token" # Security token for cluster formation
+   db_endpoint: "mysql://user:pass@host:3306/k3s" # MySQL database connection string
+   api_endpoint: "your_api_ip" # IP address where the Kubernetes API will be exposed
    ```
 
 Configuration variables:

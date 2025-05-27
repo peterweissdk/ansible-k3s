@@ -1,5 +1,4 @@
 ---
----
 # Playbook to uninstall K3s from all nodes in the cluster
 # The uninstallation happens in two phases:
 # 1. Agent nodes are uninstalled first
@@ -39,13 +38,20 @@
         msg: "K3s agent service on {{ inventory_hostname }}: {{ 'Removed' if not agent_service_check.stat.exists else 'Still present' }}"
 
     # Remove K3s directories and their contents
+    # This task is idempotent - will not fail if directories don't exist
     - name: Clean up K3s directories
       file:
+        # path: Directory to remove, populated from the loop
         path: "{{ item }}"
+        # state: absent removes the directory and all its contents
         state: absent
+      # Loop through these directories:
+      # - /etc/rancher/k3s: Contains configuration files, certificates, and manifests
+      # - /var/lib/rancher/k3s: Contains cluster data, container images, and storage
       loop:
         - /etc/rancher/k3s
         - /var/lib/rancher/k3s
+      # Continue even if directory deletion fails
       ignore_errors: true
 
 # Phase 2: Uninstall K3s from control plane nodes
@@ -81,10 +87,16 @@
         msg: "K3s server service on {{ inventory_hostname }}: {{ 'Removed' if not server_service_check.stat.exists else 'Still present' }}"
 
     # Remove K3s directories and their contents
+    # This task is idempotent - will not fail if directories don't exist
     - name: Clean up K3s directories
       file:
+        # path: Directory to remove, populated from the loop
         path: "{{ item }}"
+        # state: absent removes the directory and all its contents
         state: absent
+      # Loop through these directories:
+      # - /etc/rancher/k3s: Contains configuration files, certificates, and manifests
+      # - /var/lib/rancher/k3s: Contains cluster data, container images, and storage
       loop:
         - /etc/rancher/k3s
         - /var/lib/rancher/k3s

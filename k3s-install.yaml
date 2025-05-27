@@ -1,5 +1,9 @@
 ---
 # Playbook to install a K3s Kubernetes cluster with control plane and agent nodes
+# The installation happens in two phases:
+# 1. Control plane nodes are installed first
+# 2. Agent nodes are installed last
+# Each phase processes one node at a time to ensure controlled cluster formation
 - name: Install K3s Cluster
   # Target all hosts in the k3s_cluster group
   hosts: k3s_cluster

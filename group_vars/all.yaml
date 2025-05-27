@@ -3,10 +3,10 @@
 k3s_version: v1.31.5+k3s1
 
 # Define a secure token for cluster formation. Change this to a strong, random string
-k3s_token: secret_token
+k3s_token: k3stoken
 
 # MySQL database connection string. Update username, password, IP address, and database name
-db_endpoint: "mysql://username:password@tcp(192.168.1.102:3306)/k3s"
+db_endpoint: "mysql://username:password@tcp(192.168.1.202:3306)/k3s"
 
 # IP address where the Kubernetes API will be exposed. Set this to your primary control plane node's IP
-api_endpoint: "192.168.1.2"
+api_endpoint: "192.168.1.201"

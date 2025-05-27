@@ -6,20 +6,6 @@
 # It handles both control plane and agent node installation, ensuring proper cluster
 # formation and configuration.
 #
-# Execution Flow:
-# 1. Control Plane Installation (Phase 1)
-#    - Installs K3s server components
-#    - Configures the database endpoint
-#    - Ensures API server availability
-#
-# 2. Agent Node Installation (Phase 2)
-#    - Joins agent nodes to the cluster
-#    - Configures agent-specific settings
-#
-# 3. Cluster Verification and Configuration (Phase 3)
-#    - Ensures all nodes are properly joined and ready
-#    - Displays the cluster's kubeconfig for external access
-#
 # Required Variables:
 # - k3s_version: Version of K3s to install
 # - k3s_token: Cluster join token

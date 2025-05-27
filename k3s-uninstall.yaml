@@ -1,29 +1,44 @@
 ---
+---
 # Playbook to uninstall K3s from all nodes in the cluster
+# The uninstallation happens in two phases:
+# 1. Agent nodes are uninstalled first
+# 2. Control plane nodes are uninstalled last
+# Each phase processes one node at a time to ensure controlled cluster teardown
+
+# Phase 1: Uninstall K3s from agent nodes
 - name: Uninstall K3s from agent nodes
+  # Target all hosts in the agents group from inventory
   hosts: agents
+  # Run tasks with elevated privileges
   become: true
-  # Process one agent at a time
+  # Process one agent at a time for controlled teardown
   serial: 1
   tasks:
+    # Execute the K3s agent uninstall script
     - name: Run K3s agent uninstall script
       shell: /usr/local/bin/k3s-agent-uninstall.sh
+      # Continue playbook even if uninstall fails
       ignore_errors: true
       register: agent_uninstall
 
+    # Display the uninstall result
     - name: Check if uninstall was successful
       debug:
         msg: "Agent uninstall on {{ inventory_hostname }} completed with status: {{ 'Success' if agent_uninstall.rc == 0 else 'Failed - ' + agent_uninstall.stderr }}"
 
+    # Verify if the K3s agent service file still exists
     - name: Check if K3s agent service exists
       stat:
         path: /etc/systemd/system/k3s-agent.service
       register: agent_service_check
 
+    # Report whether the service file was removed
     - name: Report agent service status
       debug:
         msg: "K3s agent service on {{ inventory_hostname }}: {{ 'Removed' if not agent_service_check.stat.exists else 'Still present' }}"
 
+    # Remove K3s directories and their contents
     - name: Clean up K3s directories
       file:
         path: "{{ item }}"
@@ -33,30 +48,39 @@
         - /var/lib/rancher/k3s
       ignore_errors: true
 
+# Phase 2: Uninstall K3s from control plane nodes
 - name: Uninstall K3s from control plane nodes
+  # Target all hosts in the control_plane group from inventory
   hosts: control_plane
+  # Run tasks with elevated privileges
   become: true
-  # Process one control plane node at a time
+  # Process one control plane node at a time for controlled teardown
   serial: 1
   tasks:
+    # Execute the K3s server uninstall script
     - name: Run K3s server uninstall script
       shell: /usr/local/bin/k3s-uninstall.sh
+      # Continue playbook even if uninstall fails
       ignore_errors: true
       register: server_uninstall
 
+    # Display the uninstall result
     - name: Check if uninstall was successful
       debug:
         msg: "Server uninstall on {{ inventory_hostname }} completed with status: {{ 'Success' if server_uninstall.rc == 0 else 'Failed - ' + server_uninstall.stderr }}"
 
+    # Verify if the K3s server service file still exists
     - name: Check if K3s server service exists
       stat:
         path: /etc/systemd/system/k3s.service
       register: server_service_check
 
+    # Report whether the service file was removed
     - name: Report server service status
       debug:
         msg: "K3s server service on {{ inventory_hostname }}: {{ 'Removed' if not server_service_check.stat.exists else 'Still present' }}"
 
+    # Remove K3s directories and their contents
     - name: Clean up K3s directories
       file:
         path: "{{ item }}"
@@ -64,4 +88,5 @@
       loop:
         - /etc/rancher/k3s
         - /var/lib/rancher/k3s
+      # Continue even if directory deletion fails
       ignore_errors: true

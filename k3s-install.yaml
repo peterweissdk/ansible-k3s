@@ -1,22 +1,41 @@
 ---
-# Playbook to install a K3s Kubernetes cluster with control plane and agent nodes
-# The installation happens in two phases:
-# 1. Control plane nodes are installed first
-# 2. Agent nodes are installed last
-# Each phase processes one node at a time to ensure controlled cluster formation
-- name: Install K3s Cluster
-  # Target all hosts in the k3s_cluster group
-  hosts: k3s_cluster
-  # Run tasks with elevated privileges
+# Playbook: K3s Kubernetes Cluster Installation and Configuration
+#
+# Purpose:
+# This playbook automates the deployment of a K3s Kubernetes cluster with multiple nodes.
+# It handles both control plane and agent node installation, ensuring proper cluster
+# formation and configuration.
+#
+# Execution Flow:
+# 1. Control Plane Installation (Phase 1)
+#    - Installs K3s server components
+#    - Configures the database endpoint
+#    - Ensures API server availability
+#
+# 2. Agent Node Installation (Phase 2)
+#    - Joins agent nodes to the cluster
+#    - Configures agent-specific settings
+#
+# 3. Cluster Verification and Configuration (Phase 3)
+#    - Ensures all nodes are properly joined and ready
+#    - Displays the cluster's kubeconfig for external access
+#
+# Required Variables:
+# - k3s_version: Version of K3s to install
+# - k3s_token: Cluster join token
+# - db_endpoint: External database connection string
+# - api_endpoint: Kubernetes API endpoint address
+
+# Phase 1: Install Control Plane Nodes
+# This phase runs serially across control plane nodes to ensure proper cluster formation
+- name: Install K3s Control Plane
+  hosts: control_plane
   become: true
-  # Process one host at a time to ensure controlled cluster formation
   serial: 1
 
   tasks:
     # Install K3s in server mode on control plane nodes
     - name: Install and verify control plane nodes
-      # Only run this block on hosts in the control_plane group
-      when: inventory_hostname in groups['control_plane']
       block:
         # Download and install K3s server
         - name: Install K3s server
@@ -55,10 +74,17 @@
           retries: 30
           delay: 10
 
+
+# Phase 2: Install Agent Nodes
+# This phase adds worker nodes to the cluster, running serially to ensure proper node joining
+- name: Install K3s Agents
+  hosts: agents
+  become: true
+  serial: 1
+
+  tasks:
     # Install K3s in agent mode on agent nodes
     - name: Install and verify agent nodes
-      # Only run this block on hosts in the agents group
-      when: inventory_hostname in groups['agents']
       block:
         # Download and install K3s agent
         - name: Install K3s agent
@@ -83,34 +109,29 @@
           retries: 10
           delay: 5
 
+
+# Phase 3: Verify Cluster Health and Display Configuration
+# This phase ensures the cluster is healthy and displays the final configuration
+- name: Verify K3s Cluster Health and Show Configuration
+  hosts: control_plane[0]
+  become: true
+
+  tasks:
     # Verify all nodes are ready in the cluster
     - name: Wait for nodes to be ready
-      # Only run this check from the first control plane node
-      when: inventory_hostname == groups['control_plane'][0]
       shell: kubectl wait --for=condition=Ready nodes --all --timeout=300s
       environment:
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-      # Store the result of waiting for nodes to be ready
       register: wait_result
-      # Retry up to 10 times with 30 second delays until all nodes are ready
       until: wait_result.rc == 0
       retries: 10
       delay: 30
 
-    # Add Kubernetes labels to agent nodes for identification
-    - name: Label agent nodes
-      # Only run this from the first control plane node
-      when: inventory_hostname == groups['control_plane'][0]
-      shell: |
-        for node in $(kubectl get nodes --selector='!node-role.kubernetes.io/master' -o name); do
-          kubectl label --overwrite $node node-role.kubernetes.io/agent=true
-        done
-      environment:
-        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
-
-    # Show the kubeconfig in the Ansible output
+    # Show the kubeconfig as the final step
     - name: Show k3s.yaml content
-      when: inventory_hostname == groups['control_plane'][0]
-      # Use debug module to print the content of k3s.yaml to the Ansible output
+      shell: cat /etc/rancher/k3s/k3s.yaml
+      register: kubeconfig
+
+    - name: Display kubeconfig
       debug:
-        msg: "{{ lookup('file', '/etc/rancher/k3s/k3s.yaml') }}"
+        msg: "{{ kubeconfig.stdout }}"

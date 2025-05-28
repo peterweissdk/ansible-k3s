@@ -44,20 +44,18 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
    db_endpoint: "mysql://user:pass@host:3306/k3s" # MySQL database connection string
    api_endpoint: "your_api_ip" # IP address where the Kubernetes API will be exposed
 
-## 🔄 Default Components
+3. Enable / Disable default components : 
+   ```bash
+   - Remove `--disable=traefik` to keep the built-in Traefik ingress controller
+   - Remove `--disable=servicelb` to use the built-in ServiceLB load balancer
+   - Remove `--datastore-endpoint` to use the default embedded etcd instead of external database
+   ```
 
-K3s comes with several built-in components that are enabled by default. The installation command in `k3s-install.yaml` uses flags to disable some of these. To keep the default components, simply remove their corresponding flags:
-
-- Remove `--disable=traefik` to keep the built-in Traefik ingress controller
-- Remove `--disable=servicelb` to use the built-in ServiceLB load balancer
-- Remove `--datastore-endpoint` to use the default embedded etcd instead of external database
-
-Example installation command with defaults:
-```bash
-curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.31.5+k3s1 sh -s - server \
-    --token=your_secure_token \
-    --tls-san=your_api_ip
-```
+4. Example installation command with defaults:
+   ```bash
+   curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.31.5+k3s1 sh -s - server \
+      --token=your_secure_token \
+      --tls-san=your_api_ip
    ```
 
 ## 📝 Directory Structure

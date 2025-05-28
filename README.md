@@ -2,12 +2,13 @@
 [![Static Badge](https://img.shields.io/badge/Ansible-Automation-white?style=flat&logo=ansible&logoColor=white&logoSize=auto&labelColor=black)](https://docs.ansible.com/)
 [![Static Badge](https://img.shields.io/badge/K3s-Kubernetes-white?style=flat&logo=k3s&logoColor=white&logoSize=auto&labelColor=black)](https://k3s.io/)
 
-Automated deployment and management of a K3s Kubernetes cluster using Ansible. This project enables easy setup and teardown of a multi-node K3s cluster with dedicated control plane and agent nodes.
+Automated deployment and management of a K3s Kubernetes cluster using Ansible. This project enables easy setup and teardown of a multi-node K3s cluster, connecting to an external MariaDB database, and dedicated control plane and agent nodes.
 
 ## ✨ Features
 
 - Automated K3s cluster deployment and uninstallation
 - Multi-node support with control plane and agent nodes
+- External MariaDB database integration
 - Detailed status reporting and health checks
 - Idempotent operations - safe to re-run
 

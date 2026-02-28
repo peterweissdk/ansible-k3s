@@ -1,0 +1,142 @@
+# K3s Agent Configuration File
+# Location: /etc/rancher/k3s/config.yaml
+# K3s reads this file on startup. Uncomment and set values as needed.
+
+# =============================================================================
+# PERMANENT FLAGS
+# WARNING: These flags cannot be changed after the first agent boot!
+# =============================================================================
+
+# Shared secret for joining the cluster
+# token: ""
+
+# =============================================================================
+# SERVER CONNECTION FLAGS
+# =============================================================================
+
+# URL of K3s server to connect to
+# server: "https://server-ip:6443"
+
+# Token file path (alternative to token)
+# token-file: ""
+
+# =============================================================================
+# NODE FLAGS
+# =============================================================================
+
+# Customized node name
+# node-name: ""
+
+# Node labels (can specify multiple)
+# node-label:
+#   - "key1=value1"
+#   - "key2=value2"
+
+# Node taints (can specify multiple)
+# node-taint:
+#   - "key1=value1:NoSchedule"
+
+# IP address to advertise for node
+# node-ip: ""
+
+# External IP address to advertise for node
+# node-external-ip: ""
+
+# Add a unique suffix to the node name
+# with-node-id: true
+
+# =============================================================================
+# RUNTIME FLAGS
+# =============================================================================
+
+# Use Docker instead of containerd (deprecated, use container-runtime-endpoint)
+# docker: false
+
+# Container runtime endpoint
+# container-runtime-endpoint: ""
+
+# Snapshotter name (default: overlayfs)
+# snapshotter: "overlayfs"
+
+# Private registry configuration file
+# private-registry: "/etc/rancher/k3s/registries.yaml"
+
+# =============================================================================
+# COMPONENT FLAGS
+# =============================================================================
+
+# Kubelet arguments (can specify multiple)
+# kubelet-arg:
+#   - "max-pods=110"
+#   - "eviction-hard=memory.available<500Mi"
+
+# Kube-proxy arguments (can specify multiple)
+# kube-proxy-arg:
+#   - "ipvs-strict-arp=true"
+#   - "proxy-mode=ipvs"
+
+# =============================================================================
+# NETWORKING FLAGS
+# =============================================================================
+
+# Flannel interface
+# flannel-iface: ""
+
+# Flannel configuration directory
+# flannel-conf: ""
+
+# Flannel CNI binary path
+# flannel-cni-binaries: ""
+
+# =============================================================================
+# LOGGING FLAGS
+# =============================================================================
+
+# Log to stdout instead of journald
+# log: "/var/log/k3s-agent.log"
+
+# Also log to stderr when --log is set
+# alsologtostderr: true
+
+# Debug logging
+# debug: true
+
+# Verbose logging level
+# v: 0
+
+# =============================================================================
+# ADVANCED FLAGS
+# =============================================================================
+
+# Data directory (default: /var/lib/rancher/k3s)
+# data-dir: "/var/lib/rancher/k3s"
+
+# Protect kernel defaults
+# protect-kernel-defaults: true
+
+# SELinux support
+# selinux: true
+
+# LB server port (default: 6444)
+# lb-server-port: 6444
+
+# Rootless mode
+# rootless: true
+
+# Prefer bundled binaries over host binaries
+# prefer-bundled-bin: true
+
+# Pause image
+# pause-image: ""
+
+# Resolv.conf file path
+# resolv-conf: ""
+
+# Disable embedded containerd and use alternative CRI
+# disable-default-registry-endpoint: false
+
+# Image credential provider binary directory
+# image-credential-provider-bin-dir: ""
+
+# Image credential provider config file
+# image-credential-provider-config: ""

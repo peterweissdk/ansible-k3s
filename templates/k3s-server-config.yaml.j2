@@ -1,0 +1,266 @@
+# K3s Server Configuration File
+# Location: /etc/rancher/k3s/config.yaml
+# K3s reads this file on startup. Uncomment and set values as needed.
+
+# =============================================================================
+# PERMANENT CLUSTER-IDENTITY FLAGS
+# WARNING: These flags cannot be changed after the first control plane boot!
+# =============================================================================
+
+# External datastore endpoint (MySQL, PostgreSQL, etcd)
+# Examples:
+#   MySQL: mysql://user:pass@tcp(host:3306)/dbname
+#   PostgreSQL: postgres://user:pass@host:5432/dbname
+#   etcd: https://etcd1:2379,https://etcd2:2379,https://etcd3:2379
+# datastore-endpoint: ""
+
+# TLS certificates for external datastore (required for etcd with TLS)
+# datastore-cafile: ""
+# datastore-certfile: ""
+# datastore-keyfile: ""
+
+# Pod CIDR (default: 10.42.0.0/16)
+# cluster-cidr: "10.42.0.0/16"
+
+# Service CIDR (default: 10.43.0.0/16)
+# service-cidr: "10.43.0.0/16"
+
+# Cluster DNS service IP (default: 10.43.0.10)
+# cluster-dns: "10.43.0.10"
+
+# Cluster domain (default: cluster.local)
+# cluster-domain: "cluster.local"
+
+# Flannel backend: vxlan, host-gw, wireguard-native, none (default: vxlan)
+# flannel-backend: "vxlan"
+
+# Enable secrets encryption at rest
+# secrets-encryption: true
+
+# Shared secret for joining nodes to the cluster
+# token: ""
+
+# =============================================================================
+# NETWORKING FLAGS
+# =============================================================================
+
+# Flannel external IP
+# flannel-external-ip: true
+
+# Flannel interface
+# flannel-iface: ""
+
+# Flannel IPv6 masquerade
+# flannel-ipv6-masq: true
+
+# Egress selector mode: agent, cluster, pod, disabled (default: agent)
+# egress-selector-mode: "agent"
+
+# ServiceLB namespace (default: kube-system)
+# servicelb-namespace: "kube-system"
+
+# =============================================================================
+# NODE FLAGS
+# =============================================================================
+
+# Customized node name
+# node-name: ""
+
+# Node labels (can specify multiple)
+# node-label:
+#   - "key1=value1"
+#   - "key2=value2"
+
+# Node taints (can specify multiple)
+# node-taint:
+#   - "key1=value1:NoSchedule"
+
+# IP address to advertise for node
+# node-ip: ""
+
+# External IP address to advertise for node
+# node-external-ip: ""
+
+# Add a unique suffix to the node name
+# with-node-id: true
+
+# =============================================================================
+# RUNTIME FLAGS
+# =============================================================================
+
+# Container runtime endpoint
+# container-runtime-endpoint: ""
+
+# Snapshotter name (default: overlayfs)
+# snapshotter: "overlayfs"
+
+# Private registry configuration file
+# private-registry: "/etc/rancher/k3s/registries.yaml"
+
+# =============================================================================
+# COMPONENT FLAGS
+# =============================================================================
+
+# Disable packaged components (can specify multiple)
+# disable:
+#   - "traefik"
+#   - "servicelb"
+#   - "local-storage"
+#   - "metrics-server"
+#   - "coredns"
+
+# Disable Helm controller
+# disable-helm-controller: true
+
+# Disable network policy controller
+# disable-network-policy: true
+
+# Disable cloud controller manager
+# disable-cloud-controller: true
+
+# Disable kube-proxy
+# disable-kube-proxy: true
+
+# =============================================================================
+# TLS / CERTIFICATE FLAGS
+# =============================================================================
+
+# TLS Subject Alternative Names (can specify multiple)
+# tls-san:
+#   - "my-kubernetes-api.example.com"
+#   - "192.168.1.100"
+
+# TLS SAN security (disable adding hostname to TLS SAN)
+# tls-san-security: true
+
+# Data directory (default: /var/lib/rancher/k3s)
+# data-dir: "/var/lib/rancher/k3s"
+
+# =============================================================================
+# AGENT FLAGS (also apply to server)
+# =============================================================================
+
+# Kubelet arguments (can specify multiple)
+# kubelet-arg:
+#   - "max-pods=110"
+#   - "eviction-hard=memory.available<500Mi"
+
+# Kube-proxy arguments (can specify multiple)
+# kube-proxy-arg:
+#   - "ipvs-strict-arp=true"
+#   - "proxy-mode=ipvs"
+
+# Kube-apiserver arguments (can specify multiple)
+# kube-apiserver-arg:
+#   - "audit-log-path=/var/log/k3s-audit.log"
+
+# Kube-controller-manager arguments (can specify multiple)
+# kube-controller-manager-arg:
+#   - "node-cidr-mask-size=24"
+
+# Kube-scheduler arguments (can specify multiple)
+# kube-scheduler-arg:
+#   - "v=2"
+
+# Kube-cloud-controller-manager arguments (can specify multiple)
+# kube-cloud-controller-manager-arg:
+#   - ""
+
+# Etcd arguments (for embedded etcd, can specify multiple)
+# etcd-arg:
+#   - "quota-backend-bytes=8589934592"
+
+# =============================================================================
+# LOGGING FLAGS
+# =============================================================================
+
+# Log to stdout instead of journald
+# log: "/var/log/k3s.log"
+
+# Also log to stderr when --log is set
+# alsologtostderr: true
+
+# Debug logging
+# debug: true
+
+# Verbose logging level
+# v: 0
+
+# =============================================================================
+# ADVANCED FLAGS
+# =============================================================================
+
+# Bind address (default: 0.0.0.0)
+# bind-address: "0.0.0.0"
+
+# HTTPS listen port (default: 6443)
+# https-listen-port: 6443
+
+# Advertise address
+# advertise-address: ""
+
+# Advertise port (default: 0, uses https-listen-port)
+# advertise-port: 0
+
+# Protect kernel defaults
+# protect-kernel-defaults: true
+
+# SELinux support
+# selinux: true
+
+# LB server port (default: 6444)
+# lb-server-port: 6444
+
+# Write kubeconfig with this mode
+# write-kubeconfig-mode: "0644"
+
+# Write kubeconfig to this path
+# write-kubeconfig: "/etc/rancher/k3s/k3s.yaml"
+
+# Rootless mode
+# rootless: true
+
+# Prefer bundled binaries over host binaries
+# prefer-bundled-bin: true
+
+# System default registry
+# system-default-registry: ""
+
+# Pause image
+# pause-image: ""
+
+# Enable embedded etcd (for HA without external datastore)
+# cluster-init: true
+
+# URL of existing cluster to join (for HA)
+# server: ""
+
+# Reset cluster to new bootstrap data
+# cluster-reset: false
+
+# Path to snapshot to restore
+# cluster-reset-restore-path: ""
+
+# Etcd snapshot directory
+# etcd-snapshot-dir: "/var/lib/rancher/k3s/server/db/snapshots"
+
+# Enable etcd snapshots
+# etcd-disable-snapshots: false
+
+# Snapshot interval (default: 12h)
+# etcd-snapshot-schedule-cron: "0 */12 * * *"
+
+# Number of snapshots to retain (default: 5)
+# etcd-snapshot-retention: 5
+
+# Compress etcd snapshots
+# etcd-snapshot-compress: true
+
+# S3 endpoint for etcd snapshots
+# etcd-s3: false
+# etcd-s3-endpoint: ""
+# etcd-s3-bucket: ""
+# etcd-s3-region: ""
+# etcd-s3-folder: ""
+# etcd-s3-access-key: ""
+# etcd-s3-secret-key: ""

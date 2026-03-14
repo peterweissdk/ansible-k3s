@@ -31,8 +31,34 @@
 # Cluster domain (default: cluster.local)
 # cluster-domain: "cluster.local"
 
-# Flannel backend: vxlan, host-gw, wireguard-native, none (default: vxlan)
+# =============================================================================
+# CNI (Container Network Interface) CONFIGURATION
+# WARNING: CNI selection is permanent and cannot be changed after first boot!
+# =============================================================================
+
+# Flannel backend options: vxlan, host-gw, wireguard-native, none (default: vxlan)
+# Set to "none" to disable Flannel and use an alternative CNI (Cilium, Calico, etc.)
 # flannel-backend: "vxlan"
+
+# -----------------------------------------------------------------------------
+# CILIUM CNI
+# To use Cilium instead of Flannel:
+#   1. Set: flannel-backend: "none"
+#   2. Set: disable-network-policy: true
+#   3. Optionally set: disable-kube-proxy: true (if using Cilium kube-proxy replacement)
+#   4. After cluster is up, install Cilium via Helm:
+#      helm repo add cilium https://helm.cilium.io/
+#      helm install cilium cilium/cilium --namespace kube-system
+# -----------------------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
+# CALICO CNI
+# To use Calico instead of Flannel:
+#   1. Set: flannel-backend: "none"
+#   2. Set: disable-network-policy: true
+#   3. After cluster is up, install Calico:
+#      kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+# -----------------------------------------------------------------------------
 
 # Enable secrets encryption at rest
 # secrets-encryption: true

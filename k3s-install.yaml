@@ -30,6 +30,25 @@
             state: directory
             mode: '0755'
 
+        # Create directory for etcd certificates (if using external etcd)
+        - name: Create etcd certs directory
+          file:
+            path: /etc/rancher/k3s/certs
+            state: directory
+            mode: '0700'
+
+        # Copy etcd certificates to control plane nodes (if they exist locally)
+        - name: Copy etcd certificates
+          copy:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            mode: '0600'
+          loop:
+            - { src: "certs/ca-bundle.crt", dest: "/etc/rancher/k3s/certs/ca-bundle.crt" }
+            - { src: "certs/etcd-client.crt", dest: "/etc/rancher/k3s/certs/etcd-client.crt" }
+            - { src: "certs/etcd-client.key", dest: "/etc/rancher/k3s/certs/etcd-client.key" }
+          ignore_errors: yes
+
         # Deploy K3s server configuration file
         - name: Deploy K3s server config
           template:

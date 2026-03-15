@@ -15,9 +15,11 @@
 # datastore-endpoint: ""
 
 # TLS certificates for external datastore (required for etcd with TLS)
-# datastore-cafile: ""
-# datastore-certfile: ""
-# datastore-keyfile: ""
+# Note: Place certificates in certs/ directory in the Ansible project root.
+#       They will be copied to /etc/rancher/k3s/certs/ on target nodes.
+# datastore-cafile: "/etc/rancher/k3s/certs/ca-bundle.crt"
+# datastore-certfile: "/etc/rancher/k3s/certs/etcd-client.crt"
+# datastore-keyfile: "/etc/rancher/k3s/certs/etcd-client.key"
 
 # Pod CIDR (default: 10.42.0.0/16)
 # cluster-cidr: "10.42.0.0/16"

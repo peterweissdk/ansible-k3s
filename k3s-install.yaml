@@ -148,7 +148,32 @@
   become: true
 
   tasks:
-    # Verify all nodes are ready in the cluster
+    # Check if external CNI is being used (flannel-backend: none)
+    - name: Check flannel backend setting
+      shell: grep -E "^flannel-backend:" /etc/rancher/k3s/config.yaml | awk '{print $2}' | tr -d '"'
+      register: flannel_backend
+      changed_when: false
+      failed_when: false
+
+    # Show CNI reminder if using external CNI
+    - name: External CNI reminder
+      debug:
+        msg: |
+          ============================================================
+          EXTERNAL CNI REQUIRED
+          flannel-backend is set to 'none' - nodes will remain NotReady
+          until you install a CNI plugin (Cilium, Calico, etc.)
+          
+          For Cilium:
+            helm repo add cilium https://helm.cilium.io/
+            helm install cilium cilium/cilium --namespace kube-system
+          
+          For Calico:
+            kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+          ============================================================
+      when: flannel_backend.stdout == "none"
+
+    # Verify all nodes are ready in the cluster (skip if using external CNI)
     - name: Wait for nodes to be ready
       shell: kubectl wait --for=condition=Ready nodes --all --timeout=300s
       environment:
@@ -157,8 +182,8 @@
       until: wait_result.rc == 0
       retries: 10
       delay: 30
-      # This task only checks node readiness, it doesn't modify the system
       changed_when: false
+      when: flannel_backend.stdout != "none"
 
     # Show the kubeconfig as the final step
     - name: Read kubeconfig

@@ -2,13 +2,14 @@
 [![Static Badge](https://img.shields.io/badge/Ansible-Automation-white?style=flat&logo=ansible&logoColor=white&logoSize=auto&labelColor=black)](https://docs.ansible.com/)
 [![Static Badge](https://img.shields.io/badge/K3s-Kubernetes-white?style=flat&logo=k3s&logoColor=white&logoSize=auto&labelColor=black)](https://k3s.io/)
 
-Automated deployment and management of a K3s Kubernetes cluster using Ansible. This project enables easy setup and teardown of a multi-node K3s cluster, connecting to an external MariaDB database, and dedicated control plane and agent nodes.
+Automated deployment and management of a K3s Kubernetes cluster using Ansible. This project enables easy setup and teardown of a multi-node K3s cluster, connecting to an external database, and dedicated control plane and agent nodes.
 
 ## ✨ Features
 
 - Automated K3s cluster deployment and uninstallation
 - Multi-node support with control plane and agent nodes
-- External MariaDB database integration
+- External database integration
+- Comprehensive templating for K3s server and agent configurations
 - Detailed status reporting and health checks
 - Idempotent operations - safe to re-run
 
@@ -38,29 +39,46 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
    agent2 ansible_host=192.168.1.5
    ```
 
-2. Update configuration in `group_vars/all.yaml`:
+2. Set K3s version in `group_vars/all.yaml`:
    ```yaml
-   k3s_version: "v1.31.5+k3s1" # Specify K3s version to install
-   k3s_token: "your_secure_token" # Security token for cluster formation
-   db_endpoint: "mysql://user:pass@host:3306/k3s" # MySQL database connection string
-   api_endpoint: "your_api_ip" # IP address where the Kubernetes API will be exposed
-
-3. Enable / Disable default components : 
-   ```bash
-   - Remove `--disable=traefik` to keep the built-in Traefik ingress controller
-   - Remove `--disable=servicelb` to use the built-in ServiceLB load balancer
-   - Remove `--datastore-endpoint` to use the default embedded etcd instead of external database
+   k3s_version: "v1.31.5+k3s1"
    ```
+
+3. Configure K3s server settings in `templates/k3s-server-config.yaml.j2`:
+   - Uncomment and set values as needed
+   - **Permanent flags** (cannot be changed after first boot): `datastore-endpoint`, `cluster-cidr`, `service-cidr`, `flannel-backend`, `token`, etc.
+   - **CNI options**: Set `flannel-backend: "none"` to use Cilium or Calico instead of Flannel
+   - **Component flags**: Disable traefik, servicelb, etc. as needed
+
+4. Configure K3s agent settings in `templates/k3s-agent-config.yaml.j2`:
+   - Uncomment and set values as needed
+   - Configure `server` and `token` to join the cluster
+
+5. (Optional) For external etcd with TLS, place certificates in `certs/` directory:
+   ```
+   certs/
+   ├── ca-bundle.crt
+   ├── etcd-client.crt
+   └── etcd-client.key
+   ```
+   These will be automatically copied to `/etc/rancher/k3s/certs/` on control plane nodes.
 
 ## 📝 Directory Structure
 
 ```
 ansible-k3s/
+├── certs/                              # (Optional) etcd TLS certificates
+│   ├── ca-bundle.crt
+│   ├── etcd-client.crt
+│   └── etcd-client.key
 ├── group_vars/
-│   └── all.yaml
-├── hosts
-├── k3s-install.yaml
-├── k3s-uninstall.yaml
+│   └── all.yaml                        # K3s version configuration
+├── templates/
+│   ├── k3s-server-config.yaml.j2       # K3s server configuration template
+│   └── k3s-agent-config.yaml.j2        # K3s agent configuration template
+├── hosts                               # Ansible inventory file
+├── k3s-install.yaml                    # Cluster installation playbook
+├── k3s-uninstall.yaml                  # Cluster uninstallation playbook
 ├── LICENSE
 └── README.md
 ```

@@ -61,6 +61,8 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
    ├── etcd-client.crt
    └── etcd-client.key
    ```
+   **Note:** The client certificate must have Extended Key Usage (EKU) set to `Client Authentication (clientAuth)`.
+   
    These will be automatically copied to `/etc/rancher/k3s/certs/` on control plane nodes.
 
 ## 📝 Directory Structure

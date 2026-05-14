@@ -44,9 +44,9 @@
             dest: "{{ item.dest }}"
             mode: '0600'
           loop:
-            - { src: "certs/ca-bundle.crt", dest: "/etc/rancher/k3s/certs/ca-bundle.crt" }
-            - { src: "certs/etcd-client.crt", dest: "/etc/rancher/k3s/certs/etcd-client.crt" }
-            - { src: "certs/etcd-client.key", dest: "/etc/rancher/k3s/certs/etcd-client.key" }
+            - { src: "certs/etcd-ca.crt", dest: "/etc/rancher/k3s/certs/etcd-ca.crt" }
+            - { src: "certs/apiserver-etcd-client.crt", dest: "/etc/rancher/k3s/certs/apiserver-etcd-client.crt" }
+            - { src: "certs/apiserver-etcd-client.key", dest: "/etc/rancher/k3s/certs/apiserver-etcd-client.key" }
           ignore_errors: yes
 
         # Deploy K3s server configuration file

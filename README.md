@@ -57,9 +57,9 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
 5. (Optional) For external etcd with TLS, place certificates in `certs/` directory:
    ```
    certs/
-   ├── ca-bundle.crt
-   ├── etcd-client.crt
-   └── etcd-client.key
+   ├── etcd-ca.crt
+   ├── apiserver-etcd-client.crt
+   └── apiserver-etcd-client.key
    ```
    **Note:** The client certificate must have Extended Key Usage (EKU) set to `Client Authentication (clientAuth)`.
    
@@ -70,9 +70,9 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
 ```
 ansible-k3s/
 ├── certs/                              # (Optional) etcd TLS certificates
-│   ├── ca-bundle.crt
-│   ├── etcd-client.crt
-│   └── etcd-client.key
+│   ├── etcd-ca.crt
+│   ├── apiserver-etcd-client.crt
+│   └── apiserver-etcd-client.key
 ├── group_vars/
 │   └── all.yaml                        # K3s version configuration
 ├── templates/

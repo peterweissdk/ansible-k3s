@@ -65,6 +65,28 @@ Automated deployment and management of a K3s Kubernetes cluster using Ansible. T
    
    These will be automatically copied to `/etc/rancher/k3s/certs/` on control plane nodes.
 
+## 🧹 CNI Cleanup Script
+
+If you have previously installed K3s or another Kubernetes distribution, there may be leftover CNI files (Calico, Flannel, Cilium) that can cause conflicts with a new installation.
+
+A cleanup script `rm_cni.sh` is provided to find and remove these files. This functionality is intentionally **not built into the Ansible playbook** due to the risk of accidental multiple file deletions across the filesystem.
+
+**Usage:**
+```bash
+# Copy the script to each node and run as root
+sudo ./rm_cni.sh
+```
+
+The script will:
+1. Search the entire filesystem for files containing `calico`, `flannel`, or `cilium`
+2. Display a numbered list of found files
+3. Prompt for action:
+   - `a` - Delete all files (with confirmation)
+   - `1,3,5` - Exclude specific file numbers from deletion
+   - `e` - Exit without deleting
+
+**Note:** Run this script on each node **before** running the K3s installation playbook if you suspect leftover CNI files from previous installations.
+
 ## 📝 Directory Structure
 
 ```
@@ -85,28 +107,6 @@ ansible-k3s/
 ├── LICENSE
 └── README.md
 ```
-
-## 🧹 CNI Cleanup Script
-
-If you have previously installed K3s or another Kubernetes distribution, there may be leftover CNI files (Calico, Flannel, Cilium) that can cause conflicts with a new installation.
-
-A cleanup script `rm_cni.sh` is provided to find and remove these files. This functionality is intentionally **not built into the Ansible playbook** due to the potential for multiple file deletions across the filesystem.
-
-**Usage:**
-```bash
-# Copy the script to each node and run as root
-sudo ./rm_cni.sh
-```
-
-The script will:
-1. Search the entire filesystem for files containing `calico`, `flannel`, or `cilium`
-2. Display a numbered list of found files
-3. Prompt for action:
-   - `a` - Delete all files (with confirmation)
-   - `1,3,5` - Exclude specific file numbers from deletion
-   - `e` - Exit without deleting
-
-**Note:** Run this script on each node **before** running the K3s installation playbook if you suspect leftover CNI files from previous installations.
 
 ## 🔍 Health Check
 
